@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Payment Form</title>
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="/css/custom.css" />
+</head>
+
+<body>
+	<div class="container">
+		<h1>Confirm Your Payment</h1>
+		<form action="#" th:action="@{/transactions}" th:object="${transaction}" method="post">
+			<div class="first-row">
+				<div class="owner">
+					<h3>Card Holder</h3>
+					<div class="input-field">
+						<input type="text" th:field="*{creditCardHolder}">
+					</div>
+				</div>
+				<div class="cvv">
+					<h3>CVV</h3>
+					<div class="input-field">
+						<input type="password" th:field="*{cvv}">
+					</div>
+				</div>
+			</div>
+			<div class="second-row">
+				<div class="card-number">
+					<h3>Card Number</h3>
+					<div class="input-field">
+						<input type="text" th:field="*{creditCardNumber}">
+					</div>
+				</div>
+				<div class="amount">
+					<h3>amount</h3>
+					<div class="input-field">
+						<input type="text" th:field="*{amount}">
+					</div>
+				</div>
+			</div>
+			<div class="third-row">
+				<div class="selection">
+					<div>
+						<h3>Expiration Date</h3>
+						<div class="date">
+							<select th:field="*{expiryMonth}">
+								<option th:each="p : ${listMonths}" th:value="${p}" th:text="${p}" />
+							</select>
+							<select th:field="*{expiryYear}">
+								<option th:each="p : ${listYears}" th:value="${p}" th:text="${p}" />
+							</select>
+						</div>
+					</div>
+					<div class="country">
+						<h3>Country</h3>
+						<select th:field="*{country}">
+							<option th:each="p : ${listCountries}" th:value="${p}" th:text="${p}" />
+
+						</select>
+
+					</div>
+					<div class="cards">
+						<img src="../static/images/mc.png" th:src="@{images/mc.png}" />
+						<img src="../static/images/vi.png" th:src="@{images/vi.png}" />
+						<img src="../static/images/pp.png" th:src="@{images/pp.png}" />
+					</div>
+				</div>
+			</div>
+			<div class="fourth-row">
+				<button type="submit">Pay</button>
+			</div>
+		</form>
+
+		<hr>
+
+		<a th:href="@{/}"> Back to Transaction History</a>
+
+	</div>
+</body>
+
+</html>

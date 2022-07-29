@@ -1,0 +1,47 @@
+
+package com.rules;
+
+import com.springboot.creditcardfrauddetection.model.CreditCardTransaction;
+import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Date;
+import com.springboot.creditcardfrauddetection.model.DetectedFraudsReport;
+
+global java.util.ArrayList reportList
+
+
+declare CreditCardTransaction
+    @role( event )
+    @timestamp( timestamp )    
+end
+
+
+rule "CC-Transactions last 5 minutes"
+when 
+
+	accumulate ($cct: CreditCardTransaction() over window:time (5m) from entry-point Transactions;
+				$nrOfTransactions : count($cct), 
+				$list: collectList($cct);
+				$nrOfTransactions >= 3)
+	$c1: CreditCardTransaction() from $list
+				 
+then
+	System.out.println("\nFound 3 or more credit card transactions in last 5 minutes of current transaction");
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"Found 3 or more credit card transactions in last 5 minutes of current transaction",$c1.getId(),new Date($c1.getTimestamp()));
+	reportList.add(report);
+	end
+
+
+rule "CC-Transactions Within 30 Seconds Of each other"
+when 
+	accumulate ($cct: CreditCardTransaction()  from entry-point Transactions; 
+				$list: collectList($cct))
+	$c1: CreditCardTransaction() from $list
+	$c2: CreditCardTransaction(this != $c1, this after[0s, 30s] $c1) from $list	
+				 
+then
+	System.out.println("And within that collection, there are 2 transactions within 30 seconds of each other.\n");
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"within that collection, there are 2 transactions within 30 seconds of each other",$c1.getId(),new Date($c1.getTimestamp()));
+	reportList.add(report);
+end
+

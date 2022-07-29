@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Detected Fraud Report For Given Transaction</title>
+
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+</head>
+ <body>
+	<div class="container">
+		<h1>Detected Fraud Report For Given Transaction</h1>
+		<hr>
+		<h2>Found potential fraud</h2>
+
+		
+		<table border="1" class = "table table-striped table-responsive-md">
+			<thead>
+				<tr>
+				<th>
+						 Credit Card Number
+							
+					</th>
+					<th>
+						Transaction ID
+							
+					</th>
+					<th>
+						Transaction Time
+					</th>
+					<th>
+					Message </th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="fraudReport : ${listReport}">
+				<td th:text="${fraudReport.creditCardNumber}"></td>
+					<td th:text="${fraudReport.transaction_id}"></td>
+					<td th:text="${fraudReport.transaction_time}"></td>
+					<td th:text="${fraudReport.message}"></td>
+				
+				</tr>
+			</tbody>
+		</table>	
+		
+		<hr>
+		
+		<a th:href = "@{/}"> Back to Transaction History</a>
+	</div>
+</body> 
+</html>

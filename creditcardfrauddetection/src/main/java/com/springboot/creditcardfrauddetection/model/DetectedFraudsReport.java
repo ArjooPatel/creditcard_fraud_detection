@@ -8,6 +8,9 @@ public class DetectedFraudsReport {
 	private String message;
 	private long transaction_id;
 	private Date transaction_time;
+	private int disputeRiskRating;
+	private int cardHolderRiskRating;
+	
 	
 	public DetectedFraudsReport(long creditCardNumber, String message, long transaction_id, Date transaction_time) {
 		super();
@@ -15,6 +18,16 @@ public class DetectedFraudsReport {
 		this.message = message;
 		this.transaction_id = transaction_id;
 		this.transaction_time = transaction_time;
+	}
+
+	public DetectedFraudsReport(long creditCardNumber, String message, long transaction_id, Date transaction_time,
+			int disputeRiskRating) {
+		super();
+		this.creditCardNumber = creditCardNumber;
+		this.message = message;
+		this.transaction_id = transaction_id;
+		this.transaction_time = transaction_time;
+		this.disputeRiskRating = disputeRiskRating;
 	}
 
 	public DetectedFraudsReport() {
@@ -51,6 +64,22 @@ public class DetectedFraudsReport {
 
 	public void setTransaction_time(Date transaction_time) {
 		this.transaction_time = transaction_time;
+	}
+
+	public int getDisputeRiskRating() {
+		return disputeRiskRating;
+	}
+
+	public void setDisputeRiskRating(int disputeRiskRating) {
+		this.disputeRiskRating = disputeRiskRating;
+	}
+
+	public int getCardHolderRiskRating() {
+		return cardHolderRiskRating;
+	}
+
+	public void setCardHolderRiskRating(int cardHolderRiskRating) {
+		this.cardHolderRiskRating = cardHolderRiskRating;
 	}
 
 	@Override

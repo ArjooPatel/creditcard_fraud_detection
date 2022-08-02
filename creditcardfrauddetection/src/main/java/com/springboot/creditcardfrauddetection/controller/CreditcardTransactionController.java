@@ -32,17 +32,6 @@ public class CreditcardTransactionController {
 	TransactionService transactionService;
 	
 	
-	//display list of transactions
-	/*@GetMapping("/")
-	public String viewHomepage(Model model){
-		model.addAttribute("listTransactions", transactionService.getAllTransactions());
-		return "index";
-	}*/
-	
-	
-		
-
-	
 	@GetMapping("/payment")
 	public String payment(Model model) {
 		// create model attribute to bind form data

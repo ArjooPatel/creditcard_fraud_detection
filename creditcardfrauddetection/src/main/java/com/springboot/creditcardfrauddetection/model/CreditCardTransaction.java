@@ -53,6 +53,20 @@ public class CreditCardTransaction{
 	@Column(name = "country")
 	private String country;
 	
+	@Column(name = "age")
+	private int cardholderAge;
+	 
+	@Column(name = "cardholder_status")
+	private String cardholder_status;
+	
+	@Column(name = "fraudammount")
+	@JsonProperty("fraudAmmount")
+	@JsonSerialize(using = MoneySerializer.class)
+	private BigDecimal fraud_amount;
+	
+	@Column(name = "incedentcount")
+	private int incedent_count;
+	
 	private Date created_Date;
 
 	/*public CreditCardTransaction() {
@@ -139,6 +153,38 @@ public class CreditCardTransaction{
 
 	public void setCreated_Date(Date created_Date) {
 		this.created_Date = created_Date;
+	}
+	
+	public int getCardholderAge() {
+		return cardholderAge;
+	}
+
+	public void setCardholderAge(int cardholderAge) {
+		this.cardholderAge = cardholderAge;
+	}
+
+	public String getCardholder_status() {
+		return cardholder_status;
+	}
+
+	public void setCardholder_status(String cardholder_status) {
+		this.cardholder_status = cardholder_status;
+	}
+
+	public BigDecimal getFraud_amount() {
+		return fraud_amount;
+	}
+
+	public void setFraud_amount(BigDecimal fraud_amount) {
+		this.fraud_amount = fraud_amount;
+	}
+
+	public int getIncedent_count() {
+		return incedent_count;
+	}
+
+	public void setIncedent_count(int incedent_count) {
+		this.incedent_count = incedent_count;
 	}
 
 	@Override

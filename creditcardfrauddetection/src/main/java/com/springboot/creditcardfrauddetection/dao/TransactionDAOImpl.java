@@ -1,4 +1,5 @@
 package com.springboot.creditcardfrauddetection.dao;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -50,6 +51,18 @@ public class TransactionDAOImpl implements TransactionDAO {
 				transaction.setCvv(rs.getLong("CVV"));
 				transaction.setExpiryMonth(rs.getString("EXPIRY_MONTH"));
 				transaction.setExpiryYear(rs.getLong("EXPIRY_YEAR"));
+//				if(rs.getString("CREDIT_CARD_HOLDER")=="JHON") {
+//					//rule-4 and 9
+//					transaction.setCardholder_status("STANDARD");
+//					transaction.setIncedent_count(3);
+//					transaction.setFraud_amount(new BigDecimal(30));
+//				}else if(rs.getString("CREDIT_CARD_HOLDER")=="MARIO") {
+//					//rule-1
+//					transaction.setCardholder_status("PLATINUM");
+//					transaction.setIncedent_count(4);
+//					transaction.setFraud_amount(new BigDecimal(123));
+//				}
+				
 				transactionList.add(transaction);
 			}
 			rs.close();

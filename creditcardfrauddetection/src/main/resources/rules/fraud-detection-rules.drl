@@ -9,29 +9,104 @@ import com.springboot.creditcardfrauddetection.model.DetectedFraudsReport;
 
 global java.util.ArrayList reportList
 
-
 declare CreditCardTransaction
     @role( event )
     @timestamp( timestamp )    
 end
 
-
+//rules to get frequent suspicious transactions within a very less time
 rule "CC-Transactions last 5 minutes"
-when 
-
-	accumulate ($cct: CreditCardTransaction() over window:time (5m) from entry-point Transactions;
-				$nrOfTransactions : count($cct), 
-				$list: collectList($cct);
-				$nrOfTransactions >= 3)
-	$c1: CreditCardTransaction() from $list
+salience 30
+activation-group "Frequent_Transactions"
+	when 
+		accumulate ($cct: CreditCardTransaction() over window:time (5m) from entry-point Transactions;
+					$nrOfTransactions : count($cct), 
+					$list: collectList($cct);
+					$nrOfTransactions >= 3)
+		$c1: CreditCardTransaction() from $list
 				 
-then
-	System.out.println("\nFound 3 or more credit card transactions in last 5 minutes of current transaction");
-	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"Found 3 or more credit card transactions in last 5 minutes of current transaction",$c1.getId(),new Date($c1.getTimestamp()));
-	reportList.add(report);
+	then
+		System.out.println("\nFound 3 or more credit card transactions in last 5 minutes of current transaction");
+		DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"Found 3 or more credit card transactions in last 5 minutes of current transaction",$c1.getId(),new Date($c1.getTimestamp()));
+		reportList.add(report);
 	end
 
+rule "CC-Transactions last 10 minutes"
+salience 25
+activation-group "Frequent_Transactions"
+	when 
+		accumulate ($cct: CreditCardTransaction() over window:time (10m) from entry-point Transactions;
+					$nrOfTransactions : count($cct), 
+					$list: collectList($cct);
+					$nrOfTransactions >= 5)
+		$c1: CreditCardTransaction() from $list			 
+	then
+		System.out.println("\nFound 5 or more credit card transactions in last 10 minutes of current transaction");
+		DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"Found 5 or more credit card transactions in last 10 minutes of current transaction",$c1.getId(),new Date($c1.getTimestamp()));
+		reportList.add(report);
+	end
+	
+rule "CC-Transactions last 15 minutes"
+salience 20
+activation-group "Frequent_Transactions"
+	when 
+		accumulate ($cct: CreditCardTransaction() over window:time (15m) from entry-point Transactions;
+					$nrOfTransactions : count($cct), 
+					$list: collectList($cct);
+					$nrOfTransactions >= 7)
+		$c1: CreditCardTransaction() from $list
+	then
+		System.out.println("\nFound 7 or more credit card transactions in last 15 minutes of current transaction");
+		DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"Found 7 or more credit card transactions in last 15 minutes of current transaction",$c1.getId(),new Date($c1.getTimestamp()));
+		reportList.add(report);
+	end
+	
+rule "CC-Transactions last 20 minutes"
+salience 15
+activation-group "Frequent_Transactions"
+	when 
+		accumulate ($cct: CreditCardTransaction() over window:time (20m) from entry-point Transactions;
+					$nrOfTransactions : count($cct), 
+					$list: collectList($cct);
+					$nrOfTransactions >= 9)
+		$c1: CreditCardTransaction() from $list
+	then
+		System.out.println("\nFound 9 or more credit card transactions in last 20 minutes of current transaction");
+		DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"Found 9  or more credit card transactions in last 20 minutes of current transaction",$c1.getId(),new Date($c1.getTimestamp()));
+		reportList.add(report);
+	end
+	
+rule "CC-Transactions last 25 minutes"
+salience 10
+activation-group "Frequent_Transactions"
+	when 
+		accumulate ($cct: CreditCardTransaction() over window:time (25m) from entry-point Transactions;
+					$nrOfTransactions : count($cct), 
+					$list: collectList($cct);
+					$nrOfTransactions >= 11)
+		$c1: CreditCardTransaction() from $list			 
+	then
+		System.out.println("\nFound 11 or more credit card transactions in last 25 minutes of current transaction");
+		DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"Found 11  or more credit card transactions in last 25 minutes of current transaction",$c1.getId(),new Date($c1.getTimestamp()));
+		reportList.add(report);
+	end
+	
+rule "CC-Transactions last 30 minutes"
+salience 5
+activation-group "Frequent_Transactions"
+	when 
+		accumulate ($cct: CreditCardTransaction() over window:time (30m) from entry-point Transactions;
+					$nrOfTransactions : count($cct), 
+					$list: collectList($cct);
+					$nrOfTransactions >= 13)
+		$c1: CreditCardTransaction() from $list
+	then
+		System.out.println("\nFound 13 or more credit card transactions in last 30 minutes of current transaction");
+		DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"Found 13  or more credit card transactions in last 30 minutes of current transaction",$c1.getId(),new Date($c1.getTimestamp()));
+		reportList.add(report);
+	end
 
+// rules to get transactions within 30 seconds of each other
 rule "CC-Transactions Within 30 Seconds Of each other"
 when 
 	accumulate ($cct: CreditCardTransaction()  from entry-point Transactions; 
@@ -45,3 +120,214 @@ then
 	reportList.add(report);
 end
 
+// rules to compute credit_card holder risk rating
+rule "rule-1"
+when 
+	$c1: CreditCardTransaction(incedent_count >3 && cardholder_status =="PLATINUM") from entry-point Transactions;	
+				 
+then
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"credit_card holder risk rating value is 1",$c1.getId(),new Date($c1.getTimestamp()));
+	report.setCardHolderRiskRating(1);
+	reportList.add(report);
+end
+
+rule "rule-2"
+when 
+	$c1: CreditCardTransaction(incedent_count >2 && cardholder_status =="GOLD") from entry-point Transactions;	
+				 
+then
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"credit_card holder risk rating value is 1",$c1.getId(),new Date($c1.getTimestamp()));
+	report.setCardHolderRiskRating(1);
+	reportList.add(report);
+end
+
+rule "rule-3"
+when 
+	$c1: CreditCardTransaction(incedent_count >2 && cardholder_status =="SILVER") from entry-point Transactions;	
+				 
+then
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"credit_card holder risk rating value is 2",$c1.getId(),new Date($c1.getTimestamp()));
+	report.setCardHolderRiskRating(2);
+	reportList.add(report);
+end
+
+rule "rule-4"
+when 
+	$c1: CreditCardTransaction(incedent_count >2 && cardholder_status =="STANDARD") from entry-point Transactions;	
+				 
+then
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"credit_card holder risk rating value is 3",$c1.getId(),new Date($c1.getTimestamp()));
+	report.setCardHolderRiskRating(3);
+	reportList.add(report);
+end
+
+rule "rule-5"
+when 
+	$c1: CreditCardTransaction(cardholderAge<25 && cardholder_status =="SILVER") from entry-point Transactions;	
+				 
+then
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"credit_card holder risk rating value is 1",$c1.getId(),new Date($c1.getTimestamp()));
+	report.setCardHolderRiskRating(1);
+	reportList.add(report);
+end
+
+rule "rule-6"
+when 
+	$c1: CreditCardTransaction(cardholderAge<25 && cardholder_status =="STANDARD") from entry-point Transactions;	
+				 
+then
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"credit_card holder risk rating value is 2",$c1.getId(),new Date($c1.getTimestamp()));
+	report.setCardHolderRiskRating(2);
+	reportList.add(report);
+end
+
+rule "rule-7"
+when 
+	$c1: CreditCardTransaction(cardholderAge>=25 && cardholder_status =="STANDARD") from entry-point Transactions;	
+				 
+then
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"credit_card holder risk rating value is 1",$c1.getId(),new Date($c1.getTimestamp()));
+	report.setCardHolderRiskRating(1);
+	reportList.add(report);
+end
+
+rule "rule-8"
+when 
+	$c1: CreditCardTransaction() from entry-point Transactions;		 
+then
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"credit_card holder risk rating value is 0",$c1.getId(),new Date($c1.getTimestamp()));
+	report.setCardHolderRiskRating(0);
+	reportList.add(report);
+end
+
+// rules to compute Dispute Risk rating
+rule "rule-9"
+when 
+	$c1: CreditCardTransaction(cardholder_status =="STANDARD" && fraud_amount < 25) from entry-point Transactions;	
+				 
+then
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"Dispute risk rating value is 1",$c1.getId(),new Date($c1.getTimestamp()));
+	report.setDisputeRiskRating(1);
+	reportList.add(report);
+end
+
+rule "rule-10"
+when 
+	$c1: CreditCardTransaction(cardholder_status =="SILVER" && fraud_amount < 50) from entry-point Transactions;	
+				 
+then
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"Dispute risk rating value is 1",$c1.getId(),new Date($c1.getTimestamp()));
+	report.setDisputeRiskRating(1);
+	reportList.add(report);
+end
+
+rule "rule-11"
+when 
+	$c1: CreditCardTransaction(cardholder_status =="GOLD" && fraud_amount < 75) from entry-point Transactions;	
+				 
+then
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"Dispute risk rating value is 1",$c1.getId(),new Date($c1.getTimestamp()));
+	report.setDisputeRiskRating(1);
+	reportList.add(report);
+end
+
+rule "rule-12"
+when 
+	$c1: CreditCardTransaction(cardholder_status =="PLATINUM" && fraud_amount < 100) from entry-point Transactions;	
+				 
+then
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"Dispute risk rating value is 1",$c1.getId(),new Date($c1.getTimestamp()));
+	report.setDisputeRiskRating(1);
+	reportList.add(report);
+end
+
+rule "rule-13"
+when 
+	$c1: CreditCardTransaction(cardholder_status =="STANDARD" && fraud_amount>25 && fraud_amount < 150) from entry-point Transactions;	
+				 
+then
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"Dispute risk rating value is 3",$c1.getId(),new Date($c1.getTimestamp()));
+	report.setDisputeRiskRating(3);
+	reportList.add(report);
+end
+
+rule "rule-14"
+when 
+	$c1: CreditCardTransaction(cardholder_status =="SILVER" && fraud_amount>50 && fraud_amount < 150) from entry-point Transactions;	
+				 
+then
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"Dispute risk rating value is 2",$c1.getId(),new Date($c1.getTimestamp()));
+	report.setDisputeRiskRating(2);
+	reportList.add(report);
+end
+
+rule "rule-15"
+when 
+	$c1: CreditCardTransaction(cardholder_status =="GOLD" && fraud_amount> 75 &&  fraud_amount < 150) from entry-point Transactions;	
+				 
+then
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"Dispute risk rating value is 2",$c1.getId(),new Date($c1.getTimestamp()));
+	report.setDisputeRiskRating(2);
+	reportList.add(report);
+end
+
+rule "rule-16"
+when 
+	$c1: CreditCardTransaction(cardholder_status =="PLATINUM" && fraud_amount> 100 &&  fraud_amount < 150) from entry-point Transactions;	
+				 
+then
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"Dispute risk rating value is 2",$c1.getId(),new Date($c1.getTimestamp()));
+	report.setDisputeRiskRating(2);
+	reportList.add(report);
+end
+
+rule "rule-17"
+when 
+	$c1: CreditCardTransaction(cardholder_status =="STANDARD" && fraud_amount> 150 &&  fraud_amount < 200) from entry-point Transactions;	
+				 
+then
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"Dispute risk rating value is 4",$c1.getId(),new Date($c1.getTimestamp()));
+	report.setDisputeRiskRating(4);
+	reportList.add(report);
+end
+
+rule "rule-18"
+when 
+	$c1: CreditCardTransaction(cardholder_status =="SILVER" && fraud_amount> 150 && fraud_amount < 200) from entry-point Transactions;	
+				 
+then
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"Dispute risk rating value is 3",$c1.getId(),new Date($c1.getTimestamp()));
+	report.setDisputeRiskRating(3);
+	reportList.add(report);
+end
+
+rule "rule-19"
+when 
+	$c1: CreditCardTransaction(cardholder_status =="GOLD" && fraud_amount> 150 &&  fraud_amount < 200) from entry-point Transactions;	
+				 
+then
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"Dispute risk rating value is 2",$c1.getId(),new Date($c1.getTimestamp()));
+	report.setDisputeRiskRating(2);
+	reportList.add(report);
+end
+
+rule "rule-20"
+when 
+	$c1: CreditCardTransaction(fraud_amount >= 200) from entry-point Transactions;	
+				 
+then
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"Dispute risk rating value is 5",$c1.getId(),new Date($c1.getTimestamp()));
+	report.setDisputeRiskRating(5);
+	reportList.add(report);
+end
+
+rule "rule-21"
+when 
+	$c1: CreditCardTransaction() from entry-point Transactions;		 
+then
+	DetectedFraudsReport report= new DetectedFraudsReport($c1.getCreditCardNumber(),"Dispute risk rating value is 0",$c1.getId(),new Date($c1.getTimestamp()));
+	report.setDisputeRiskRating(0);
+	reportList.add(report);
+end
+
+//cvv value validation rules
